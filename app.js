@@ -36,18 +36,30 @@ app.get("/", function(req, res){
 });
 
 
+const requestedPostId = req.params.postId;
+
 app.get("/compose", function(req, res){
   res.render("compose");
 });
 
-app.post("/compose", function(req, res){
+app.get("/posts/:postId", function(req, res){
 
   const post = new Post ({
     title: req.body.postTitle,
     content: req.body.postBody
   });
 
-  post.save();
+
+  post.save(function(err){
+
+  if (!err){
+
+    res.redirect("/");
+
+  }
+
+});
+post.save();
 
   res.redirect("/");
 
@@ -69,6 +81,20 @@ app.get("/posts/:postName", function(req, res){
 
 });
 
+Post.findOne({_id: requestedPostId}, function(err, post){
+
+   res.render("post", {
+
+     title: post.title,
+
+     content: post.content
+
+   });
+
+ });
+
+
+
 app.get("/about", function(req, res){
   res.render("about", {aboutContent: aboutContent});
 });
@@ -76,6 +102,8 @@ app.get("/about", function(req, res){
 app.get("/contact", function(req, res){
   res.render("contact", {contactContent: contactContent});
 });
+
+
 
 app.listen(3000, function() {
   console.log("Server started on port 3000");
